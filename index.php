@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
         $_SESSION['notice'] = 'Changes saved. Connected templates can now use this content.';
         header('Location: ' . $base . '&page=' . (in_array($action, ['create','duplicate'], true) ? 1 : $page)); exit;
-    } catch (Throwable $ex) { $error = $ex instanceof RuntimeException ? $ex->getMessage() : 'Unable to save content. Check storage permissions.'; $failed = true; }
+    } catch (Throwable $ex) { if ($ex instanceof ContentValidationException) { $fieldErrors = $ex->errors; } $error = $ex instanceof RuntimeException ? $ex->getMessage() : 'Unable to save content. Check storage permissions.'; $failed = true; }
 }
 $data = content_defaults(); $readable = true;
 try { $data = content_read(); } catch (Throwable $ex) { $error = $ex->getMessage(); $readable = false; }

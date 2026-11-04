@@ -63,7 +63,7 @@ if (definitionList) {
 }
 
 function updateImagePreview(select) {
-  const preview = select.nextElementSibling;
+  const preview = select.parentElement.querySelector('.image-preview');
   const option = select.selectedOptions[0];
   preview.hidden = !option?.dataset.url;
   if (option?.dataset.url) { preview.src = option.dataset.url; preview.alt = option.dataset.alt || ''; }
