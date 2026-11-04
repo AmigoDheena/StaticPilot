@@ -1,0 +1,6 @@
+Options -Indexes -MultiViews
+DirectoryIndex index.php
+# This folder is the backend only. Website rewrites belong in its parent.
+<FilesMatch "^(setup|bootstrap|content-store|template-data|urls|developer-help|route|field-schema|admin-fields|media-store)\.php$">
+    Require all denied
+</FilesMatch>

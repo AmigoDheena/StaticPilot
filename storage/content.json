@@ -1,0 +1,50 @@
+{
+    "schema_version": 1,
+    "company": {
+        "name": "Amigo Dheena",
+        "email": "",
+        "phone": "",
+        "whatsapp": "",
+        "address": "",
+        "address_short": "",
+        "base_url": "",
+        "custom_fields": []
+    },
+    "social": {
+        "facebook": "",
+        "twitter": "",
+        "instagram": "",
+        "linkedin": "",
+        "youtube": ""
+    },
+    "services": [],
+    "products": [],
+    "pages": [],
+    "menu": [],
+    "testimonials": [],
+    "custom_sections": [
+        {
+            "name": "Our Purpose",
+            "slug": "our-purpose",
+            "description": "Our Purpose Intro",
+            "custom_fields": [],
+            "items": [
+                {
+                    "name": "Our Goal",
+                    "description": "Our Goal Desc",
+                    "custom_fields": []
+                },
+                {
+                    "name": "Our Mission",
+                    "description": "Our Mission Desc",
+                    "custom_fields": []
+                },
+                {
+                    "name": "Our Vision",
+                    "description": "Our Vision Desc",
+                    "custom_fields": []
+                }
+            ]
+        }
+    ]
+}

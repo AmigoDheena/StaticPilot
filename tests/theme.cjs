@@ -1,0 +1,30 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const source = fs.readFileSync(require('node:path').join(__dirname, '../theme.js'), 'utf8');
+function boot(saved, dark = false, blocked = false) {
+  const events = {}, windowEvents = {}, attributes = {};
+  const media = {matches:dark, addEventListener:(_, handler) => { media.change = handler; }};
+  const buttons = ['light','dark','system'].map(mode => ({dataset:{themeChoice:mode}, setAttribute:(_, value) => { attributes[mode] = value; }}));
+  const document = {documentElement:{dataset:{}}, querySelectorAll:() => buttons, addEventListener:(type, handler) => { events[type] = handler; }};
+  const storage = {getItem:() => { if (blocked) throw Error('Denied'); return saved; }, setItem:(_, value) => { if (blocked) throw Error('Denied'); saved = value; }};
+  vm.runInNewContext(source, {document, localStorage:storage, window:{matchMedia:() => media, addEventListener:(type, handler) => { windowEvents[type] = handler; }}});
+  return {document, media, attributes, saved:() => saved, click:mode => events.click({target:{closest:() => buttons.find(button => button.dataset.themeChoice === mode)}}), sync:value => windowEvents.storage({key:'staticpilot-theme',newValue:value})};
+}
+let app = boot('dark');
+assert.equal(app.document.documentElement.dataset.theme, 'dark', 'saved theme applies before DOM ready');
+app.click('light');
+assert.equal(app.saved(), 'light');
+assert.equal(boot(app.saved(), true).document.documentElement.dataset.theme, 'light', 'explicit preference survives reload');
+app.click('system');
+app.media.matches = true;
+app.media.change();
+assert.equal(app.document.documentElement.dataset.theme, 'dark');
+assert.equal(app.attributes.system, 'true');
+app.sync('light');
+assert.equal(app.document.documentElement.dataset.theme, 'light', 'other-tab changes apply');
+assert.equal(boot('invalid', true).document.documentElement.dataset.theme, 'dark');
+app = boot(null, true, true);
+app.click('light');
+assert.equal(app.document.documentElement.dataset.theme, 'light', 'appearance works when persistence is blocked');
+console.log('PASS: initial theme, reload persistence, system changes, cross-tab sync, invalid preference, blocked storage.');
