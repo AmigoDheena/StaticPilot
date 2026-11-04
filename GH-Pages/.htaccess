@@ -1,0 +1,2 @@
+# Local Apache preview; GitHub Pages serves index.html automatically.
+DirectoryIndex index.html

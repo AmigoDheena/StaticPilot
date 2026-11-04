@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8fa">
+  <meta name="description" content="StaticPilot is a lightweight, file-based PHP CMS for custom websites. Give clients a simple content dashboard. Keep complete control of your frontend.">
+  <meta property="og:title" content="StaticPilot — Your website. Your way.">
+  <meta property="og:description" content="A small CMS for websites with a personality. Editable content, plain PHP, and no database.">
+  <meta property="og:type" content="website">
+  <title>StaticPilot — Your website. Your way.</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="#" aria-label="StaticPilot home"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 26 16 5h12L16 26H4Z"/><path d="M11 17h12"/></svg>StaticPilot<span class="brand-dot">.</span></a>
+      <nav aria-label="Main navigation"><a href="#features">Features</a><a href="#how-it-works">How it works</a><a href="#questions">FAQs</a></nav>
+      <a class="github-link" href="https://github.com/AmigoDheena/StaticPilot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4 1-4-2-6-2m12 5v-4a3 3 0 0 0-.8-2.3c2.7-.3 5.5-1.3 5.5-6a4.7 4.7 0 0 0-1.3-3.2 4.3 4.3 0 0 0-.1-3.2s-1-.3-3.3 1.2a11 11 0 0 0-6 0C6.7 3 5.7 3.3 5.7 3.3a4.3 4.3 0 0 0-.1 3.2 4.7 4.7 0 0 0-1.3 3.2c0 4.7 2.8 5.7 5.5 6A3 3 0 0 0 9 18v4"/></svg><span>View on GitHub</span><span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+  <main id="main">
+    <section class="hero container" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="availability"><span></span> Small CMS. Full creative control.</p>
+        <h1 id="hero-title">Your website.<br>Your design.<br><em>Your way.</em></h1>
+        <p class="hero-description">The content dashboard for websites that don’t fit a template. Keep your frontend. Give your clients a simple way to make it their own.</p>
+        <div class="hero-actions"><a class="button primary" href="#get-started">Start building <span aria-hidden="true">↗</span></a><a class="text-link" href="#preview">Explore the dashboard <span aria-hidden="true">↓</span></a></div>
+        <p class="hero-note">Plain PHP <span>·</span> File-based storage <span>·</span> No database</p>
+      </div>
+      <div class="hero-visual" aria-label="Illustration of the StaticPilot content flow">
+        <div class="orbit-label"><span class="tiny-mark">&lt;/&gt;</span> Made for your existing website</div>
+        <div class="website-window">
+          <div class="window-bar"><div class="window-dots"><i></i><i></i><i></i></div><span>your-website.com</span><span aria-hidden="true">↗</span></div>
+          <div class="sample-site"><div class="sample-nav"><strong>Forma<span>®</span></strong><span>Studio &nbsp; Work &nbsp; Contact</span></div><p>Independent design studio</p><h2>Good things.<br>Made with care.</h2><div class="sample-bottom"><span>A little strategy.<br>A lot of possibility.</span><div class="sample-art" aria-hidden="true"><span></span><span></span><span></span></div></div></div>
+        </div>
+        <div class="content-float"><span class="float-icon" aria-hidden="true">Aa</span><div><small>Your content, connected</small><strong>One edit. Right where it belongs.</strong></div><span class="connected-dot" aria-hidden="true"></span></div>
+        <div class="code-float"><span class="code-dot"></span><code>require 'StaticPilot/template-data.php';</code></div>
+        <p class="visual-caption">Your frontend + a little StaticPilot.</p>
+      </div>
+    </section>
+    <div class="fit-strip"><div class="container"><p>A small footprint.<br><strong>A natural fit.</strong></p><span>Company websites</span><span>Creative portfolios</span><span>Service businesses</span><span>Product showcases</span></div></div>
+    <section class="preview-section container section" id="preview" aria-labelledby="preview-title">
+      <div class="section-heading"><div><p class="eyebrow">A calmer way to manage content</p><h2 id="preview-title">Simple on the surface.<br>Thoughtful underneath.</h2></div><p>Everything your clients need to update their website, in one focused workspace. Try the sections in this illustrative preview.</p></div>
+      <div class="dashboard">
+        <aside class="demo-sidebar"><div class="demo-brand"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 26 16 5h12L16 26H4Z"/></svg>StaticPilot</div><div class="demo-workspace"><span>F</span><div>Forma Studio<small>Website workspace</small></div></div><div class="demo-tabs" role="tablist" aria-label="Dashboard preview sections" aria-orientation="vertical"><button type="button" id="tab-company" role="tab" aria-selected="true" aria-controls="demo-panel" data-demo="company"><span aria-hidden="true">▤</span>Company details</button><button type="button" id="tab-services" role="tab" aria-selected="false" tabindex="-1" aria-controls="demo-panel" data-demo="services"><span aria-hidden="true">▦</span>Services <small>3</small></button><button type="button" id="tab-custom" role="tab" aria-selected="false" tabindex="-1" aria-controls="demo-panel" data-demo="custom"><span aria-hidden="true">⊞</span>Custom sections <small>2</small></button></div><p class="demo-sidebar-note">Your content.<br>Your workspace.</p></aside>
+        <div class="demo-main"><div class="demo-topbar"><span>Workspace <b>/</b> <span id="demo-breadcrumb">Company details</span></span><span class="preview-badge">Interactive preview</span></div><div class="demo-panel" id="demo-panel" role="tabpanel" aria-labelledby="tab-company" tabindex="0"><div class="demo-page-title"><div><h3 id="demo-title">Company details</h3><p id="demo-description">The little details that make your business, yours.</p></div><span class="demo-avatar">F</span></div><div id="demo-content"><div class="demo-form"><div class="demo-field wide"><span>Company name</span><div>Forma Studio</div></div><div class="demo-field"><span>Email</span><div>hello@example.com</div></div><div class="demo-field"><span>Phone</span><div>+1 (555) 010-2040</div></div><div class="demo-field wide"><span>Website URL</span><div>https://example.com</div></div><div class="demo-field wide"><span>Social media links</span><div>https://instagram.com/example</div></div></div><div class="demo-footer"><span><i></i> Content your templates can use</span><span class="demo-tag">Company + social, together</span></div></div></div></div>
+      </div>
+      <div class="preview-caption"><span><span class="caption-dot"></span> A focused workspace for everyday edits</span><span>Illustrative content · No account needed</span></div>
+    </section>
+    <section class="features-section section" id="features"><div class="container"><div class="section-heading"><div><p class="eyebrow">Less overhead. More possibility.</p><h2>Just enough CMS.<br>All the room to create.</h2></div><p>Built for developers who care about the details, and clients who just want to change the words.</p></div><div class="feature-grid">
+      <article class="feature"><div class="feature-symbol" aria-hidden="true">{ }</div><h3>Your frontend stays yours.</h3><p>Keep your HTML, CSS, JavaScript, and PHP templates. StaticPilot supplies the content; you decide how it looks.</p><span>Design without the constraints</span></article>
+      <article class="feature"><div class="feature-symbol" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M7 4h12l6 6v18H7V4Zm12 0v7h6M12 17h8m-8 5h5"/></svg></div><h3>Files, not a database.</h3><p>Content lives in JSON with revision checks and atomic saves. A small, understandable system for your PHP website.</p><span>Simple by architecture</span></article>
+      <article class="feature"><div class="feature-symbol" aria-hidden="true"><svg viewBox="0 0 32 32"><rect x="5" y="5" width="8" height="8" rx="2"/><rect x="19" y="5" width="8" height="8" rx="2"/><rect x="5" y="19" width="8" height="8" rx="2"/><path d="M23 18v10m-5-5h10"/></svg></div><h3>Content that fits your site.</h3><p>Services, products, FAQs, and more. Add custom sections with shared fields when your content needs its own structure.</p><span>Built-in essentials, room for more</span></article>
+    </div><div class="detail-strip"><span>Copyable PHP examples</span><span>Search &amp; reorder</span><span>Light &amp; dark appearance</span><span>Focused client view</span></div></div></section>
+    <section class="integration section container" id="how-it-works"><div class="integration-copy"><p class="eyebrow">From content to code</p><h2>A familiar workflow.<br>A lighter handoff.</h2><p>Add StaticPilot to your PHP website. Connect your templates once. Let your clients take care of the everyday updates.</p><ol class="steps"><li><span>01</span><div><h3>Drop it into your website</h3><p>Place the StaticPilot folder in your PHP project and configure your installation.</p></div></li><li><span>02</span><div><h3>Connect your content</h3><p>Include the content adapter. Use plain variables and arrays in your own templates.</p></div></li><li><span>03</span><div><h3>Hand over the dashboard</h3><p>Clients edit their content. Your design stays in your hands.</p></div></li></ol></div><div class="code-card"><div class="code-header"><span><i></i> your-website / index.php</span><button id="copy-code" type="button" aria-label="Copy PHP integration example">Copy code <span aria-hidden="true">⧉</span></button></div><pre><code id="integration-code"><span class="syntax-muted">&lt;?php</span>
+<span class="syntax-purple">require_once</span> __DIR__ .
+  <span class="syntax-green">'/StaticPilot/template-data.php'</span>;
+<span class="syntax-muted">?&gt;</span>
+
+<span class="syntax-muted">&lt;!-- Your markup. Your saved content. --&gt;</span>
+&lt;<span class="syntax-blue">h1</span>&gt;
+  &lt;?= <span class="syntax-yellow">content_escape</span>($company_name) ?&gt;
+&lt;/<span class="syntax-blue">h1</span>&gt;
+
+&lt;?php <span class="syntax-purple">foreach</span> ($services <span class="syntax-purple">as</span> $service): ?&gt;
+  &lt;<span class="syntax-blue">article</span>&gt;
+    &lt;<span class="syntax-blue">h2</span>&gt;&lt;?= <span class="syntax-yellow">content_escape</span>(
+      $service[<span class="syntax-green">'Name'</span>]
+    ) ?&gt;&lt;/<span class="syntax-blue">h2</span>&gt;
+  &lt;/<span class="syntax-blue">article</span>&gt;
+&lt;?php <span class="syntax-purple">endforeach</span>; ?&gt;</code></pre><div class="code-bottom"><span>PHP + your imagination</span><span id="copy-status" role="status" aria-live="polite">No frontend framework required</span></div></div></section>
+    <section class="faq-section section container" id="questions"><div><p class="eyebrow">A few things to know</p><h2>Small CMS.<br>Clear answers.</h2><a class="text-link" href="https://github.com/AmigoDheena/StaticPilot#readme">Read the documentation <span aria-hidden="true">↗</span></a></div><div class="faq-list"><details open><summary>Who is StaticPilot for?<span aria-hidden="true">+</span></summary><p>Developers and small teams building custom PHP websites for businesses, portfolios, and product showcases. It gives clients a focused dashboard without taking control of your frontend.</p></details><details><summary>Do I need a database?<span aria-hidden="true">+</span></summary><p>No. StaticPilot stores content in JSON files. You’ll need a PHP-capable server and writable, protected storage. See the repository for installation and deployment guidance.</p></details><details><summary>Can I use my existing website design?<span aria-hidden="true">+</span></summary><p>Yes. Keep your existing layout, styles, and scripts. Include the PHP content adapter and replace hardcoded text with the supplied variables and arrays.</p></details><details><summary>Where do my images live?<span aria-hidden="true">+</span></summary><p>In your website’s assets folder or external hosting. StaticPilot focuses on editable content and does not include a media library or image uploads.</p></details><details><summary>Can the CMS run on GitHub Pages?<span aria-hidden="true">+</span></summary><p>This project page can. The CMS itself requires PHP hosting, so it cannot run on GitHub Pages. The two are separate: this page introduces the project; your PHP server runs the dashboard.</p></details></div></section>
+    <section class="closing container" id="get-started"><div><span class="closing-mark" aria-hidden="true">↗</span><h2>Make it yours.<br>Keep it simple.</h2><p>Your next custom website deserves a little less complexity.</p></div><div class="closing-actions"><a class="button light" href="https://github.com/AmigoDheena/StaticPilot">Get StaticPilot on GitHub <span aria-hidden="true">↗</span></a><a href="https://github.com/AmigoDheena/StaticPilot#installation">Read the installation guide <span aria-hidden="true">→</span></a><small>PHP-powered. File-based. Frontend independent.</small></div></section>
+  </main>
+  <footer class="container site-footer"><a class="brand" href="#">StaticPilot<span class="brand-dot">.</span></a><p>A little structure. A lot of freedom.</p><div><a href="https://github.com/AmigoDheena/StaticPilot">GitHub ↗</a><a href="https://github.com/AmigoDheena/StaticPilot/issues">Issues ↗</a><a href="#main">Back to top ↑</a></div></footer>
+</body>
+</html>
