@@ -1,22 +1,22 @@
 # StaticPilot
 
-StaticPilot is a lightweight, file-based PHP CMS and content dashboard for custom websites. It gives website owners a private place to manage company information, social links, services, products, pages, navigation, testimonials, FAQs, team members, images, and reusable custom sections without requiring a database or a large application framework.
+StaticPilot is a lightweight, file-based PHP CMS and content dashboard for custom websites. It gives website owners a private place to manage company information, social links, services, products, pages, navigation, testimonials, FAQs, team members, and reusable custom sections without requiring a database or a large application framework.
 
 StaticPilot was created for websites that need editable content without the complexity of a traditional enterprise CMS. It keeps the public website in the developer’s control while giving clients a clear dashboard for updating content. A website can keep its own HTML, CSS, JavaScript, PHP templates, and visual design while StaticPilot supplies the content and administration tools.
 
 The dashboard supports reusable custom sections for content that varies from one website to another. A site can define sections such as Mission and Vision, Why Choose Us, FAQs, Features, Team Members, or any other collection of entries. Each custom section can have shared fields, permanent field keys, ordering, search, duplication, custom values, and copyable PHP integration examples.
 
-StaticPilot includes typed fields for text, long text, numbers, URLs, images, checkboxes, and dropdowns. Field labels can be updated without breaking website templates because the underlying keys remain stable. The media library supports approved image uploads, alt text, previews, replacement, and reuse of the same image across different content records.
+StaticPilot includes typed fields for text, long text, numbers, URLs, checkboxes, and dropdowns. Field labels can be updated without breaking website templates because the underlying keys remain stable. Social media links are edited inside Company details and saved with the company form. Media uploads, stored media, and image fields are not part of the CMS. Manage website assets in your website project or external hosting. Open Custom sections and choose Manage entries to edit a section; there is no separate Custom collections navigation.
 
 The content adapter exposes saved data to PHP templates as simple variables and arrays. Developers choose exactly how content appears on the public website, while the dashboard handles validation, ordering, search, duplication, custom fields, and integration guidance. Content remains plain text by default so templates can escape and present it safely in their own layouts.
 
 StaticPilot includes optional clean URL routing for pages, services, and products. Existing website files remain under the developer’s control, while CMS content can be resolved through the project’s route helper when clean URLs are needed.
 
-The project is designed to stay small, understandable, and portable. It uses protected local storage, session-based administration, CSRF protection, login throttling, revision checks, atomic content saves, protected internal files, and validation for content and media uploads. Light, dark, and automatic appearance modes are available in the dashboard, along with a client view that hides developer-focused integration controls.
+The project is designed to stay small, understandable, and portable. It uses protected local storage, session-based administration, CSRF protection, login throttling, revision checks, atomic content saves, protected internal files, and content validation. Light, dark, and automatic appearance modes are available in the dashboard, along with a client view that hides developer-focused integration controls.
 
 StaticPilot is currently a focused CMS and dashboard rather than a general-purpose application framework. Its long-term direction is to provide a dependable content layer and a small set of stable extension points that developers can adapt to many different website types.
 
-The project is suitable for company websites, portfolios, agencies, service businesses, product showcases, marketing sites, and other custom PHP websites that need editable content without giving up control of the frontend. Before deploying it publicly, change the installation credentials, configure HTTPS, protect the storage directory, back up content and media, and review the server’s PHP and file permissions.
+The project is suitable for company websites, portfolios, agencies, service businesses, product showcases, marketing sites, and other custom PHP websites that need editable content without giving up control of the frontend. Before deploying it publicly, change the installation credentials, configure HTTPS, protect the storage directory, back up content, and review the server’s PHP and file permissions.
 
 ## Installation
 

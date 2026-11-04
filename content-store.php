@@ -16,18 +16,17 @@ function content_fields($section) {
         'social' => array_fill_keys(['facebook','twitter','instagram','linkedin','youtube'], ['',500,'url',false]),
         'menu' => ['name'=>['Link label',100,'text',true], 'link'=>['Link URL or relative path',500,'text',true]],
         'faqs' => ['name'=>['Question',500,'text',true], 'description'=>['Answer',20000,'textarea',true]],
-        'team' => ['name'=>['Name',180,'text',true], 'position'=>['Position',250,'text',false], 'description'=>['Biography',20000,'textarea',false], 'image_id'=>['Photo',100,'image',false]],
-        'testimonials' => ['image_id'=>['Photo',100,'image',false], 'name'=>['Name',180,'text',true], 'position'=>['Position',250,'text',false], 'review'=>['Review',20000,'textarea',true]],
+        'team' => ['name'=>['Name',180,'text',true], 'position'=>['Position',250,'text',false], 'description'=>['Biography',20000,'textarea',false]],
+        'testimonials' => ['name'=>['Name',180,'text',true], 'position'=>['Position',250,'text',false], 'review'=>['Review',20000,'textarea',true]],
     ];
     foreach ($schemas['social'] as $key => &$spec) { $spec[0] = ucfirst($key) . ' URL'; } unset($spec);
     $page = ['name'=>['Name',180,'text',true], 'slug'=>['Page address',180,'text',true], 'description'=>['Description',20000,'textarea',true], 'seo_title'=>['Search title',180,'text',false], 'seo_description'=>['Search description',500,'textarea',false]];
-    if (in_array($section, ['services','products'], true)) { $page['image_id'] = ['Image',100,'image',false]; }
     return $schemas[$section] ?? $page;
 }
 function content_defaults() {
     $data = ['schema_version'=>1];
     foreach (['company','social'] as $section) { $data[$section] = array_fill_keys(array_keys(content_fields($section)), ''); }
-    foreach (['services','products','pages','menu','testimonials','custom_sections','faqs','team','media'] as $section) { $data[$section] = []; }
+    foreach (['services','products','pages','menu','testimonials','custom_sections','faqs','team'] as $section) { $data[$section] = []; }
     return $data;
 }
 function content_read() {
@@ -35,10 +34,7 @@ function content_read() {
     if (!file_exists($path)) { return content_defaults(); }
     $data = json_decode(file_get_contents($path), true);
     if (!is_array($data) || ($data['schema_version'] ?? null) !== 1) { throw new RuntimeException('Website content is unreadable. Restore a valid content.json backup.'); }
-    foreach (['faqs','team','media'] as $newSection) { if (!array_key_exists($newSection, $data)) { $data[$newSection] = []; } if (!is_array($data[$newSection])) { throw new RuntimeException('Invalid content collection.'); } }
-    foreach (['services','products','testimonials','team'] as $imageSection) {
-        if (isset($data[$imageSection]) && is_array($data[$imageSection])) { foreach ($data[$imageSection] as &$record) { if (is_array($record) && !array_key_exists('image_id', $record)) { $record['image_id'] = ''; } } unset($record); }
-    }
+    foreach (['faqs','team'] as $newSection) { if (!array_key_exists($newSection, $data)) { $data[$newSection] = []; } if (!is_array($data[$newSection])) { throw new RuntimeException('Invalid content collection.'); } }
     if (!array_key_exists('testimonials', $data)) { $data['testimonials'] = []; }
     if (!array_key_exists('custom_sections', $data)) { $data['custom_sections'] = []; }
     if (!is_array($data['custom_sections'])) { throw new RuntimeException('Website content has invalid custom sections.'); }
@@ -128,7 +124,6 @@ function content_validate($section, $input, $data = null) {
         if ($field === 'link' && !preg_match('~^(https?://[^\s]+|mailto:[^\s]+|tel:[+0-9 -]+|/?[a-zA-Z0-9][a-zA-Z0-9/_.?#=&%-]*|/|\#[a-zA-Z0-9_-]+)$~D', $value)) { throw new RuntimeException('Enter a safe website link, relative path, email or telephone link.'); }
         if (in_array($field, ['phone','whatsapp'], true) && $value !== '' && !preg_match('/^[+0-9(). \r\n-]+$/D', $value)) { throw new RuntimeException('Phone numbers may contain digits, spaces, parentheses, + and hyphens.'); }
         $row[$field] = $value;
-        if ($spec[2] === 'image' && $value !== '' && !isset($data['media'][$value])) { throw new RuntimeException('Choose an image from the media library.'); }
         } catch (RuntimeException $ex) { $errors[$field] = $ex->getMessage(); }
     }
     if ($section === 'pages' && isset($row['slug'])) {
@@ -139,7 +134,7 @@ function content_validate($section, $input, $data = null) {
     }
     try { $row['custom_fields'] = content_custom_fields($input); } catch (RuntimeException $ex) { $errors['custom-fields'] = $ex->getMessage(); }
     try {
-        $shared = content_validate_shared(content_definitions($data, $section), $input, $data['media']);
+        $shared = content_validate_shared(content_definitions($data, $section), $input);
         $row['custom_fields'] = array_merge($row['custom_fields'] ?? [], $shared);
     } catch (ContentValidationException $ex) { $errors = array_merge($errors, $ex->errors); }
     if ($errors) { throw new ContentValidationException($errors); }

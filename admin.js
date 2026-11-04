@@ -62,37 +62,6 @@ if (definitionList) {
   });
 }
 
-function updateImagePreview(select) {
-  const preview = select.parentElement.querySelector('.image-preview');
-  const option = select.selectedOptions[0];
-  preview.hidden = !option?.dataset.url;
-  if (option?.dataset.url) { preview.src = option.dataset.url; preview.alt = option.dataset.alt || ''; }
-  else preview.removeAttribute('src');
-}
-document.querySelectorAll('.image-picker').forEach(select => select.addEventListener('change', () => updateImagePreview(select)));
-document.addEventListener('click', async event => {
-  const button = event.target.closest('.refresh-media');
-  if (!button) return;
-  button.disabled = true;
-  try {
-    const response = await fetch('media.php?format=json', {headers:{Accept:'application/json'}});
-    if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) throw Error();
-    const images = await response.json();
-    document.querySelectorAll('.image-picker').forEach(select => {
-      const selected = select.value;
-      select.replaceChildren(new Option('No image', ''));
-      images.forEach(image => {
-        const option = new Option(image.title, image.id);
-        option.dataset.url = image.url; option.dataset.alt = image.alt; select.append(option);
-      });
-      select.value = selected;
-      updateImagePreview(select);
-    });
-    button.textContent = 'Images refreshed';
-  } catch { button.textContent = 'Unable to refresh — sign in and retry'; }
-  finally { button.disabled = false; }
-});
-
 let validationId = 0;
 document.addEventListener('invalid', event => {
   const input = event.target;

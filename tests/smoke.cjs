@@ -40,15 +40,14 @@ async function save(section, input) { const r = await request('index.php?section
   await save('pages',{action:'create',...row,slug:'smoke-test-page'});
   await save('menu',{action:'create',name:'Home',link:'/'});
   r = await request('index.php?section=menu',{...await form('menu'),action:'create',name:'Unsafe',link:'javascript:alert(1)'}); assert.match(r.body,/safe website link/);
-  await save('social',{action:'save',facebook:'https://facebook.com/example'});
+  await save('company',{action:'save',name:'Test <Company>',phone:'+91 9876543210',base_url:'https://example.com','social[facebook]':'https://facebook.com/example'});
   const custom = {'custom_names[0]':'Rating','custom_values[0]':'<b>Excellent</b>'};
-  for (const section of ['company','social','services','products','pages','menu','testimonials']) {
+  for (const section of ['company','services','products','pages','menu','testimonials']) {
     const fields = section === 'company' ? {name:'Test <Company>',phone:'+91 9876543210',base_url:'https://example.com'} :
-      section === 'social' ? {facebook:'https://facebook.com/example'} :
       section === 'menu' ? {name:'Custom link',link:'/'} :
       section === 'testimonials' ? {name:'Asha',position:'Founder',review:'Thoughtful work.'} :
       {...row,slug:'smoke-custom-'+section};
-    const singleton = ['company','social'].includes(section);
+    const singleton = section === 'company';
     await save(section,{action:singleton?'save':'create',...fields,...custom});
     r = await request('index.php?section='+section+(singleton?'':'&edit=0'));
     assert.match(r.body,/value="Rating"/); assert.match(r.body,/&lt;b&gt;Excellent&lt;\/b&gt;/);
@@ -83,7 +82,7 @@ async function save(section, input) { const r = await request('index.php?section
   r = await request('index.php?section=testimonials',{...await form('testimonials'),action:'create',name:'Missing review',review:''}); assert.match(r.body,/Review is required/);
   await save('testimonials',{action:'delete',id:'1'}); await save('testimonials',{action:'delete',id:'0'});
   r = await request('index.php?section=company'); assert.match(r.body,/\$company_name/); assert.match(r.body,/aria-controls="help-name"/); assert.match(r.body,/data-copy="code-name"/);
-  for (const section of ['services','products','pages','menu','social']) { r = await request('index.php?section='+section); assert.match(r.body,/foreach/); }
+  for (const section of ['services','products','pages','menu']) { r = await request('index.php?section='+section); assert.match(r.body,/foreach/); }
   r = await request('index.php?section=pages',{...await form('pages'),action:'create',...row,slug:'staticpilot'}); assert.match(r.body,/reserved/);
   assert.equal((await request('storage/content.json')).status,403);
   const vars = JSON.parse(execFileSync('C:/xampp/php/php.exe',['-r','require "template-data.php"; echo json_encode([$company, $phone, $services["smoke-test-service.php"]]);'],{cwd:root,encoding:'utf8'}));

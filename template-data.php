@@ -3,7 +3,6 @@
 // escape them at the point of output using content_escape().
 require_once __DIR__ . '/content-store.php';
 require_once __DIR__ . '/urls.php';
-require_once __DIR__ . '/media-store.php';
 $website_content = content_read();
 $company = $website_content['company']['name'];
 $company_name = $company;
@@ -34,7 +33,6 @@ foreach (['services','products','pages'] as $collection) {
         ${$collection}[$item['slug'] . '.php'] = [
             'Name'=>$item['name'], 'Slug'=>$item['slug'], 'Desc'=>$item['description'],
             'custom_fields'=>$item['custom_fields'] ?? [],
-            'image_id'=>$item['image_id'] ?? '',
             'URL'=>content_url($collection, $item['slug']),
             'SEO_Title'=>$item['seo_title'] ?: $item['name'], 'SEO_Description'=>$item['seo_description'],
             'SEO'=>['<title>' . content_escape($item['seo_title'] ?: $item['name']) . '</title>', '<meta name="description" content="' . content_escape($item['seo_description']) . '">']

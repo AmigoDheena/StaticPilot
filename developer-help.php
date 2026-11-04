@@ -9,7 +9,6 @@ function developer_field_help($section, $key, $label, $example = null) {
     echo '</div><code id="code-' . e($key) . '">' . e($example ?? developer_field_example($section, $key)) . '</code><span class="copy-status" role="status"></span></div></details>';
 }
 function developer_field_example($section, $key) {
-    if ($key === 'image_id') { return "<?= content_image(" . ($section === 'testimonials' ? '$testimonial' : '$item') . "['image_id'] ?? '') ?>"; }
     if (in_array($section, ['faqs','team'], true)) { return "<?= content_escape(\$item['" . $key . "'] ?? '') ?>"; }
     if ($section === 'custom_sections') { return "<?= content_escape(\$custom_section['" . $key . "'] ?? '') ?>"; }
     if (strpos($section, 'custom:') === 0) { return "<?= content_escape(\$item['" . $key . "'] ?? '') ?>"; }
@@ -29,7 +28,7 @@ function developer_base_section_example($section) {
     if (in_array($section, ['faqs','team'], true)) {
         return $start . '<?php foreach ($' . $section . ' as $item): ?>' . "\n" . ($section === 'faqs' ?
             "  <article>\n    <details><summary><?= content_escape(\$item['name']) ?></summary>\n    <p><?= nl2br(content_escape(\$item['description'])) ?></p></details>\n  </article>\n" :
-            "  <article>\n    <?= content_image(\$item['image_id'] ?? '') ?>\n    <h3><?= content_escape(\$item['name']) ?></h3>\n    <p><?= content_escape(\$item['position']) ?></p>\n    <p><?= nl2br(content_escape(\$item['description'])) ?></p>\n  </article>\n") . '<?php endforeach; ?>';
+            "  <article>\n    <h3><?= content_escape(\$item['name']) ?></h3>\n    <p><?= content_escape(\$item['position']) ?></p>\n    <p><?= nl2br(content_escape(\$item['description'])) ?></p>\n  </article>\n") . '<?php endforeach; ?>';
     }
     if ($section === 'custom_sections') {
         return $start . <<<'PHP'
@@ -97,7 +96,6 @@ PHP;
         return $start . <<<'PHP'
 <?php foreach ($testimonials as $testimonial): ?>
   <figure>
-    <?= content_image($testimonial['image_id'] ?? '') ?>
     <blockquote><?= nl2br(content_escape($testimonial['review'])) ?></blockquote>
     <figcaption><?= content_escape($testimonial['name']) ?> — <?= content_escape($testimonial['position']) ?></figcaption>
   </figure>
@@ -106,7 +104,6 @@ PHP;
     }
     return $start . '<?php foreach ($' . $section . ' as $item): ?>' . "\n" . <<<'PHP'
   <article>
-    <?= content_image($item['image_id'] ?? '') ?>
     <h2><a href="<?= content_escape($item['URL']) ?>"><?= content_escape($item['Name']) ?></a></h2>
     <p><?= nl2br(content_escape($item['Desc'])) ?></p>
   </article>
@@ -124,7 +121,6 @@ function developer_custom_source($section) {
 function developer_custom_example($section, $name, $type = 'text') {
     if (trim($name) === '') { return 'Enter a field name to generate its PHP example.'; }
     $value = developer_custom_source($section) . '[' . var_export(trim($name), true) . "] ?? ''";
-    if ($type === 'image') { return '<?= content_image(' . $value . ') ?>'; }
     if ($type === 'checkbox') { return "<?= (" . $value . ") === '1' ? 'Yes' : 'No' ?>"; }
     return "<?= content_escape(" . developer_custom_source($section) . '[' . var_export(trim($name), true) . "] ?? '') ?>";
 }

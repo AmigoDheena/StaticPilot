@@ -33,62 +33,64 @@ async function save(section, data, success=true) {
 }
 const read = () => JSON.parse(fs.readFileSync(path.join(app,'storage/content.json'),'utf8'));
 const defs = (fields, existing=false) => Object.assign({definitions_present:'1'}, ...fields.map((field,i)=>Object.fromEntries(Object.entries({...field,original_key:existing?field.key:''}).map(([k,v])=>[`field_defs[${i}][${k}]`,v]))));
-async function upload(bytes, filename, extra={}) {
-  const form=new FormData();
-  for(const [k,v] of Object.entries({...await tokens('media.php'),action:'upload',title:'Sample image',alt:'A test image',...extra}))form.set(k,v);
-  if(bytes)form.set('file',new Blob([bytes],{type:'image/png'}),filename);
-  return request('media.php',form);
-}
 (async()=>{
   try {
     const listener=net.createServer();await new Promise(resolve=>listener.listen(0,'127.0.0.1',resolve));const port=listener.address().port;await new Promise(resolve=>listener.close(resolve));
     base=`http://127.0.0.1:${port}/StaticPilot/`;
     server=spawn(php,['-S',`127.0.0.1:${port}`,'-t',sandbox],{windowsHide:true,stdio:'ignore'});
     for(let i=0;i<50;i++){try{await fetch(base+'login.php');break;}catch{await new Promise(resolve=>setTimeout(resolve,100));}}
-    assert.equal((await request('media.php')).status,302);
+    assert.equal((await request('media.php')).status,404);
     let r=await request('login.php');await request('login.php',{csrf:hidden(r.body,'csrf'),username:'tester',password:'isolated-test-only'});
-    const png=execFileSync(php,['-r','$i=imagecreatetruecolor(4,3); imagepng($i); imagedestroy($i);']);
-    r=await upload(png,'sample.png');assert.equal(r.status,302);
-    const imageId=Object.keys(read().media)[0];const oldFile=read().media[imageId].file;
-    r=await request('media.php?format=json');const images=JSON.parse(r.body);assert.equal(images[0].id,imageId);
-    const publicImage=await fetch(new URL(images[0].url,base));assert.equal(publicImage.status,200);assert.equal(publicImage.headers.get('content-type'),'image/png');
-    assert.equal((await request('media-file.php?id=../../setup.php')).status,404);
-    r=await upload(Buffer.from('<?php echo "bad"; ?>'),'fake.png');assert.match(r.body,/genuine JPEG/);
-    r=await upload(png,'file.php');assert.match(r.body,/genuine JPEG/);
-    r=await upload(Buffer.alloc(5*1024*1024+1),'large.png');assert.match(r.body,/5 MB/);
-    r=await upload(png,'sample.png',{csrf:'bad'});assert.match(r.body,/session expired/);
-    const giant=execFileSync(php,['-r','$i=imagecreatetruecolor(4000,3100); imagepng($i); imagedestroy($i);']);
-    r=await upload(giant,'large-dimensions.png');assert.match(r.body,/12 megapixels/);
-    const fields=[{key:'icon',label:'Icon',type:'text'},{key:'detail',label:'Detail',type:'textarea'},{key:'score',label:'Score',type:'number',required:'1'},{key:'link',label:'Link',type:'url'},{key:'photo',label:'Photo',type:'image'},{key:'featured',label:'Featured',type:'checkbox'},{key:'category',label:'Category',type:'select',options:'Quality\nSupport'}];
+    for (const section of ['company','services','products','testimonials','team','pages','menu','faqs','custom_sections']) {
+      r=await request('index.php?section='+section);
+      assert.doesNotMatch(r.body,/image-picker|image_id|media.php|Custom collections|value="image"|content_image/);
+    }
+    const upload=new FormData();upload.set('action','upload');upload.set('file',new Blob(['test']),'test.png');
+    assert.equal((await request('media.php',upload)).status,404);
+    assert.equal((await request('media.php?format=json')).status,404);
+    assert.equal(fs.existsSync(path.join(app,'storage/media')),false);
+    r=await save('custom_sections',{action:'create',name:'Invalid',slug:'invalid',...defs([{key:'photo',label:'Photo',type:'image'}])},false);
+    assert.match(r.body,/supported type/);
+    r=await request('index.php?section=social');assert.equal(r.status,302);assert.equal(r.headers.get('location'),'?section=company#social-links');
+    await save('company',{action:'save',name:'Company','social[facebook]':'https://facebook.com/company','social[linkedin]':'https://linkedin.com/company/example'});
+    assert.equal(read().social.facebook,'https://facebook.com/company');
+    r=await request('index.php?section=company');assert.match(r.body,/Social media links/);assert.match(r.body,/value="https:\/\/facebook.com\/company"/);assert.doesNotMatch(r.body,/href="\?section=social"/);
+    const before=read();
+    r=await save('company',{action:'save',name:'Changed','social[facebook]':'javascript:alert(1)','social[linkedin]':'https://linkedin.com/company/kept'},false);
+    assert.match(r.body,/id="error-social-facebook"/);assert.match(r.body,/value="https:\/\/linkedin.com\/company\/kept"/);assert.deepEqual(read(),before);
+    await save('company',{action:'save',name:'Company','social[facebook]':''});assert.equal(read().social.facebook,'');
+    assert.equal('media' in read(),false);
+    const socialOutput=execFileSync(php,['-r','require "template-data.php"; echo $facebook;'],{cwd:app,encoding:'utf8'});assert.equal(socialOutput,'');
+    const fields=[{key:'icon',label:'Icon',type:'text'},{key:'detail',label:'Detail',type:'textarea'},{key:'score',label:'Score',type:'number',required:'1'},{key:'link',label:'Link',type:'url'},{key:'featured',label:'Featured',type:'checkbox'},{key:'category',label:'Category',type:'select',options:'Quality\nSupport'}];
     await save('custom_sections',{action:'create',name:'Why choose us',slug:'why-choose-us',...defs(fields)});
     r=await request('index.php?section=custom:why-choose-us');for(const field of fields)assert.match(r.body,new RegExp('name="shared\\['+field.key+'\\]"'));
-    const entry={action:'create',name:'Experience',description:'Years of care','shared[score]':'4.5','shared[link]':'https://example.com','shared[photo]':imageId,'shared[featured]':'1','shared[category]':'Quality','shared[icon]':'star','shared[detail]':'Long text'};
-    r=await save('custom:why-choose-us',{...entry,'shared[score]':'no','shared[link]':'javascript:alert(1)','shared[photo]':'missing','shared[category]':'invalid'},false);
-    for(const key of ['score','link','photo','category'])assert.match(r.body,new RegExp('id="error-shared-'+key+'"'));
+    const entry={action:'create',name:'Experience',description:'Years of care','shared[score]':'4.5','shared[link]':'https://example.com','shared[featured]':'1','shared[category]':'Quality','shared[icon]':'star','shared[detail]':'Long text'};
+    r=await save('custom:why-choose-us',{...entry,'shared[score]':'no','shared[link]':'javascript:alert(1)','shared[category]':'invalid'},false);
+    for(const key of ['score','link','category'])assert.match(r.body,new RegExp('id="error-shared-'+key+'"'));
     await save('custom:why-choose-us',entry);
     const renamed=fields.map(f=>f.key==='icon'?{...f,label:'Symbol'}:f);
     await save('custom_sections',{action:'save',id:'0',name:'Why choose us',slug:'why-choose-us',...defs(renamed,true)});
     assert.equal(read().custom_sections[0].items[0].custom_fields.icon,'star');
-    r=await request('index.php?section=custom:why-choose-us&edit=0');assert.match(r.body,/Symbol/);assert.match(r.body,/value="star"/);assert.match(r.body,/content_image/);
+    r=await request('index.php?section=custom:why-choose-us&edit=0');assert.match(r.body,/Symbol/);assert.match(r.body,/value="star"/);assert.doesNotMatch(r.body,/content_image/);
     const changed=defs(renamed,true);changed['field_defs[0][key]']='changed';
     r=await save('custom_sections',{action:'save',id:'0',name:'Why choose us',slug:'why-choose-us',...changed},false);assert.match(r.body,/saved field key cannot be changed/);assert.match(r.body,/id="error-definition-0"/);
     changed['field_defs[0][key]']='icon';changed['field_defs[0][type]']='number';
     r=await save('custom_sections',{action:'save',id:'0',name:'Why choose us',slug:'why-choose-us',...changed},false);assert.match(r.body,/saved field type cannot be changed/);
     await save('custom:why-choose-us',{action:'duplicate',id:'0'});assert.equal(read().custom_sections[0].items.length,2);
-    await save('custom_sections',{action:'duplicate',id:'0'});assert.equal(read().custom_sections[0].items.length,0);assert.equal(read().custom_sections[0].fields.length,7);assert.equal(read().custom_sections[0].slug,'why-choose-us-copy');
+    await save('custom_sections',{action:'duplicate',id:'0'});assert.equal(read().custom_sections[0].items.length,0);assert.equal(read().custom_sections[0].fields.length,6);assert.equal(read().custom_sections[0].slug,'why-choose-us-copy');
     await save('faqs',{action:'create',name:'Do you offer support?',description:'Yes, contact our team.'});
-    await save('team',{action:'create',name:'Priya',position:'Engineer',description:'Builds websites',image_id:imageId});
+    await save('team',{action:'create',name:'Priya',position:'Engineer',description:'Builds websites',image_id:'ignored'});
     await save('team',{action:'create',name:'Arun',position:'Designer',description:'Designs websites'});
     r=await request('index.php?section=team&q=Engineer');assert.match(r.body,/>Priya<\/a>/);assert.doesNotMatch(r.body,/>Arun<\/a>/);
-    r=await save('team',{action:'create',name:'',description:'',image_id:'invalid'},false);assert.match(r.body,/id="error-name"/);assert.match(r.body,/id="error-image_id"/);
-    await save('products',{action:'create',name:'Lamp',slug:'lamp',description:'Desk lamp',image_id:imageId});await save('products',{action:'duplicate',id:'0'});assert.equal(read().products[0].slug,'lamp-copy');
-    r=await request('index.php?section=products');assert.match(r.body,/data-url-pattern="\/products\/__SLUG__"/);assert.match(r.body,/id="view-mode-toggle"/);assert.match(r.body,/<details class="collection-nav"/);
-    r=await upload(png,'replacement.png',{action:'replace',media_id:imageId,title:'Updated image',alt:'Updated alt text'});assert.equal(r.status,302);assert.notEqual(read().media[imageId].file,oldFile);assert.equal(fs.existsSync(path.join(app,'storage/media',oldFile)),false);assert.equal(read().products[0].image_id,imageId);
-    const rendered=execFileSync(php,['-r','require "template-data.php"; echo content_image($products["lamp.php"]["image_id"]);'],{cwd:app,encoding:'utf8'});assert.match(rendered,/Updated alt text/);
+    r=await save('team',{action:'create',name:'',description:'',image_id:'invalid'},false);assert.match(r.body,/id="error-name"/);assert.doesNotMatch(r.body,/id="error-image_id"/);
+    await save('products',{action:'create',name:'Lamp',slug:'lamp',description:'Desk lamp',image_id:'ignored'});await save('products',{action:'duplicate',id:'0'});assert.equal(read().products[0].slug,'lamp-copy');
+    r=await request('index.php?section=products');assert.match(r.body,/data-url-pattern="\/products\/__SLUG__"/);assert.match(r.body,/id="view-mode-toggle"/);assert.doesNotMatch(r.body,/collection-nav|Custom collections/);
+    assert.equal(read().products[0].image_id,undefined);
+    r=await request('index.php?section=custom_sections');assert.match(r.body,/Manage entries/);
     const definitions=read().custom_sections[1].fields;
-    const output=execFileSync(php,['-r','require "template-data.php"; require "developer-help.php"; $defs=$custom_sections["why-choose-us"]["fields"]; $code=developer_section_example("custom:why-choose-us",array_column($defs,"key"),false,$defs); $code=str_replace("/StaticPilot/template-data.php","/template-data.php",$code); eval("?>".$code);'],{cwd:app,encoding:'utf8'});assert.match(output,/Updated alt text/);assert.match(output,/4.5/);assert.match(output,/Yes/);
-    assert.equal(definitions.length,7);
-    console.log('PASS: all seven shared field types, permanent keys, validation, media upload/replacement/security, FAQs/team, search, duplication, and template rendering (isolated storage).');
+    const output=execFileSync(php,['-r','require "template-data.php"; require "developer-help.php"; $defs=$custom_sections["why-choose-us"]["fields"]; $code=developer_section_example("custom:why-choose-us",array_column($defs,"key"),false,$defs); $code=str_replace("/StaticPilot/template-data.php","/template-data.php",$code); eval("?>".$code);'],{cwd:app,encoding:'utf8'});assert.doesNotMatch(output,/content_image|legacy-image/);assert.match(output,/4.5/);assert.match(output,/Yes/);
+    assert.equal(definitions.length,6);
+    console.log('PASS: six shared field types, validation, retired media endpoints, consolidated navigation, FAQs/team, search, duplication, and template rendering (isolated storage).');
   } finally {
     if(server){const stopped=new Promise(resolve=>server.once('exit',resolve));server.kill();await stopped;}
     if(!path.resolve(sandbox).startsWith(path.join(os.tmpdir(),'staticpilot-features-')))throw Error('Unexpected test cleanup path');

@@ -14,7 +14,7 @@ function content_validate_definitions($input, $existing = []) {
     if (!isset($input['definitions_present'])) { return $existing; }
     $rows = $input['field_defs'] ?? [];
     if (!is_array($rows) || count($rows) > 50) { throw new ContentValidationException(['definitions'=>'Use at most 50 shared fields.']); }
-    $types = ['text','textarea','number','url','image','checkbox','select'];
+    $types = ['text','textarea','number','url','checkbox','select'];
     $result = []; $errors = []; $old = array_column($existing, null, 'key');
     foreach ($rows as $index => $row) {
         $errorKey = 'definition-' . $index;
@@ -37,7 +37,7 @@ function content_validate_definitions($input, $existing = []) {
     if ($errors) { throw new ContentValidationException($errors); }
     return array_values($result);
 }
-function content_validate_shared($definitions, $input, $media) {
+function content_validate_shared($definitions, $input) {
     $values = $input['shared'] ?? [];
     if (!is_array($values)) { throw new ContentValidationException(['shared'=>'Invalid shared fields.']); }
     $result = []; $errors = [];
@@ -52,7 +52,6 @@ function content_validate_shared($definitions, $input, $media) {
         elseif ($type === 'url' && $value !== '' && (!filter_var($value, FILTER_VALIDATE_URL) || !preg_match('~^https?://~i', $value))) { $message = 'Enter a URL beginning with https:// or http://.'; }
         elseif ($type === 'checkbox' && !in_array($value, ['0','1'], true)) { $message = 'Choose checked or unchecked.'; }
         elseif ($type === 'select' && $value !== '' && !in_array($value, $field['options'], true)) { $message = 'Choose one of the available options.'; }
-        elseif ($type === 'image' && $value !== '' && !isset($media[$value])) { $message = 'Choose an image from the media library.'; }
         if ($message) { $errors['shared-' . $key] = $message; } else { $result[$key] = $value; }
     }
     if ($errors) { throw new ContentValidationException($errors); }
