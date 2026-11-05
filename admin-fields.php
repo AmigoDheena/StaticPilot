@@ -5,6 +5,48 @@ function field_error($key, $errors) {
 function field_error_attributes($key, $errors) {
     return isset($errors[$key]) ? ' aria-invalid="true" aria-describedby="error-' . e($key) . '"' : '';
 }
+function content_field_controls($section, $fields, $draft, $errors, $sectionManager, $editing, $seo = false) {
+    $notes = [
+        'seo_title'=>'The title shown in browser tabs and search results. Leave blank to use the page name.',
+        'seo_description'=>'A short summary for search results. Describe what visitors will find on this page.',
+        'seo_keywords'=>'Optional keywords separated by commas, for example website design, speed optimization.',
+        'seo_robots'=>'Controls search indexing and link following. Leave blank for index, follow; use noindex, follow to request exclusion from search.',
+        'canonical_url'=>'The preferred address for this content. Leave blank to use this page’s URL.',
+        'og_type'=>'Describes the shared content, for example website or article. Defaults to website.',
+        'og_url'=>'The address used when sharing on Facebook. Leave blank to use the canonical URL.',
+        'og_title'=>'The headline in the Facebook preview. Leave blank to use the primary title.',
+        'og_description'=>'The summary in the Facebook preview. Leave blank to use the primary description.',
+        'og_image'=>'Image for the Facebook preview, for example https://example.com/images/share.jpg. Leave blank to omit the image tag.',
+        'twitter_card'=>'Preview format: summary or summary_large_image. Defaults to summary_large_image.',
+        'twitter_url'=>'The shared page address. Leave blank to use the Open Graph URL.',
+        'twitter_title'=>'The headline in the Twitter preview. Leave blank to use the Open Graph title.',
+        'twitter_description'=>'The summary in the Twitter preview. Leave blank to use the Open Graph description.',
+        'twitter_image'=>'Image URL for the Twitter preview. Leave blank to use the Open Graph image.',
+    ];
+    foreach ($fields as $key=>$spec) {
+        $wide = $spec[2] === 'textarea' || in_array($key, ['address','base_url','link','canonical_url','og_url','og_image','twitter_url','twitter_image'], true);
+        echo '<div class="form-field ' . ($wide ? 'full-width' : '') . '"><div class="field-heading"><label for="' . e($key) . '">' . e($spec[0]) . ($spec[3] ? ' (required)' : '') . '</label>';
+        if (!$seo) { developer_field_help($section, $key, $spec[0]); }
+        echo '</div>';
+        $attributes = field_error_attributes($key, $errors) . ($sectionManager && $editing && $key === 'slug' ? ' readonly' : '') . ($spec[3] ? ' required' : '');
+        if ($seo) { $attributes = (isset($errors[$key]) ? ' aria-invalid="true"' : '') . ' aria-describedby="note-' . e($key) . (isset($errors[$key]) ? ' error-' . e($key) : '') . '"'; }
+        if ($spec[2] === 'textarea') {
+            echo '<textarea id="' . e($key) . '" name="' . e($key) . '" rows="' . ($key === 'description' ? '5' : '3') . '" maxlength="' . $spec[1] . '"' . $attributes . '>' . e($draft[$key] ?? '') . '</textarea>';
+        } else {
+            echo '<input id="' . e($key) . '" name="' . e($key) . '" type="' . e($spec[2]) . '" value="' . e($draft[$key] ?? '') . '" maxlength="' . $spec[1] . '"' . $attributes . '>';
+        }
+        field_error($key, $errors);
+        if ($seo) { echo '<p class="field-note" id="note-' . e($key) . '">' . e($notes[$key] ?? '') . '</p>'; }
+        elseif ($key === 'google_analytics_code') { echo '<p class="field-note">Paste the Google Analytics JavaScript snippet from your trusted analytics account. In your website template, output <code>&lt;?= $google_analytics_code ?&gt;</code> once inside <code>&lt;head&gt;</code>. This code is emitted as written so the tracking script can run.</p>'; }
+        elseif ($key === 'slug' && $sectionManager) { echo '<p class="field-note">A unique, permanent key such as <code>why-choose-us</code>. Use lowercase letters, numbers, and hyphens. Used in PHP templates; this does not create a page URL.</p>'; }
+        elseif ($key === 'slug') { echo '<p class="field-note">Use lowercase words separated by hyphens. Public URL: <span id="public-url-preview" data-url-pattern="' . e(content_url($section, '__SLUG__')) . '">' . e(content_url($section, ($draft[$key] ?? '') ?: 'example')) . '</span>. Real files and folders take precedence.</p>'; }
+        elseif (in_array($key, ['canonical_url','og_url','og_image','twitter_url','twitter_image'], true)) { echo '<p class="field-note">Use an absolute URL or a website-relative path. Leave blank to use the available primary metadata fallback.</p>'; }
+        elseif ($key === 'seo_robots') { echo '<p class="field-note">Leave blank for <code>index, follow</code>.</p>'; }
+        elseif ($key === 'og_type') { echo '<p class="field-note">Leave blank for <code>website</code>.</p>'; }
+        elseif ($key === 'twitter_card') { echo '<p class="field-note">Leave blank for <code>summary_large_image</code>.</p>'; }
+        echo '</div>';
+    }
+}
 function definition_row($index, $definition = [], $errors = []) {
     $key = $definition['key'] ?? ''; $label = $definition['label'] ?? ''; $type = $definition['type'] ?? 'text';
     $original = $definition['original_key'] ?? $key;

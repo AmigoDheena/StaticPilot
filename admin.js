@@ -100,8 +100,8 @@ if (customList && addCustom) {
       idMap.set(node.id, id);
       node.id = id;
     });
-    fragment.querySelectorAll('[for], [aria-controls], [data-copy]').forEach(node => {
-      for (const attr of ['for', 'aria-controls', 'data-copy']) {
+    fragment.querySelectorAll('[for], [aria-controls], [aria-describedby], [data-copy]').forEach(node => {
+      for (const attr of ['for', 'aria-controls', 'aria-describedby', 'data-copy']) {
         if (idMap.has(node.getAttribute(attr))) node.setAttribute(attr, idMap.get(node.getAttribute(attr)));
       }
     });

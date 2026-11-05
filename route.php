@@ -6,7 +6,8 @@ $slug = null;
 $item = null;
 $base = content_site_path();
 $requestPath = rawurldecode(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/');
-$route = substr($requestPath, 0, strlen($base)) === $base ? substr($requestPath, strlen($base)) : $requestPath;
+$inSite = substr($requestPath, 0, strlen($base)) === $base;
+$route = $inSite ? substr($requestPath, strlen($base)) : '!outside-site';
 $route = trim($route, '/');
 $home = $route === '' || $route === 'index.php';
 // Retain old bookmarks, but redirect valid query URLs to their clean address.
@@ -22,14 +23,16 @@ if ($home && (isset($_GET['type']) || isset($_GET['slug']))) {
         }
     }
     $home = false;
-} elseif (preg_match('~^(services|products)/([a-z0-9]+(?:-[a-z0-9]+)*)$~D', $route, $match)) {
-    $type = $match[1]; $slug = $match[2];
 } elseif (!$home && preg_match('~^[a-z0-9]+(?:-[a-z0-9]+)*$~D', $route)) {
-    $type = 'pages'; $slug = $route;
-}
-if ($type !== null) {
-    foreach ($website_content[$type] as $candidate) {
-        if ($candidate['slug'] === $slug) { $item = $candidate; break; }
+    $slug = $route;
+    foreach (['pages', 'services', 'products'] as $collection) {
+        foreach ($website_content[$collection] as $candidate) {
+            if ($candidate['slug'] === $slug) {
+                // Flat URLs require one unique slug across pages, services and products.
+                if ($item !== null) { $item = null; $type = null; break 2; }
+                $item = $candidate; $type = $collection;
+            }
+        }
     }
 }
 $notFound = !$home && !$item;
@@ -37,3 +40,8 @@ if ($notFound) { http_response_code(404); }
 $Name = $item['name'] ?? '';
 $Slug = $item['slug'] ?? '';
 $Desc = $item['description'] ?? '';
+$URL = $item ? content_url($type, $Slug) : '';
+$SEO_Title = $item ? ($item['seo_title'] ?: $Name) : 'Page not found';
+$SEO_Description = $item['seo_description'] ?? '';
+$custom_fields = $item['custom_fields'] ?? [];
+[$Primary_meta, $Facebook_og, $Twitter_card] = $item ? content_meta_markup($item, $type) : ['', '', ''];

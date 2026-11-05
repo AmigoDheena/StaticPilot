@@ -60,7 +60,7 @@ require_once __DIR__ . '/../StaticPilot/template-data.php';
 
 Every admin content field has a code-help icon beside its label. Open it to view the PHP example and use the copy icon to copy it. Each section also has an expandable integration example, including collection loops. All values are plain text: escape output with `content_escape()`. Do not include old hardcoded data libraries afterward; they overwrite the saved values.
 
-Available variables include `$company_name` (also `$company`), `$email`, `$phone` (array), `$address`, `$address_short`, `$whatsapp_number`, `BASE_URL`, `$facebook`, `$twitter`, `$instagram`, `$linkedin`, `$youtube`, `$menu`, `$services`, `$products`, and `$pages`. Legacy `$whatsapp`, `$phonenum`, `$footer_credit`, `$author` and `$currentYear` helpers remain available.
+Available variables include `$company_name` (also `$company`), `$email`, `$phone` (array), `$address`, `$address_short`, `$whatsapp_number`, `$google_analytics_code`, `$google_analytics`, `BASE_URL`, `$facebook`, `$twitter`, `$instagram`, `$linkedin`, `$youtube`, `$menu`, `$services`, `$products`, and `$pages`. Legacy `$whatsapp`, `$phonenum`, `$footer_credit`, `$author` and `$currentYear` helpers remain available. Paste the Google Analytics JavaScript snippet into Company details → Google Analytics JavaScript code, then output `<?= $google_analytics_code ?>` once inside your website's `<head>`. This field is intentionally emitted as raw markup so the script can run; only paste trusted tracking code from your analytics provider.
 
 ```php
 <?php foreach ($services as $service): ?>
@@ -72,3 +72,27 @@ Available variables include `$company_name` (also `$company`), `$email`, `$phone
 ```
 
 Use the same pattern for `$products` or `$pages`. Each item has `Name`, `Slug`, `Desc`, `URL`, `SEO_Title`, `SEO_Description`, and `SEO` (already escaped HTML tags). Array keys remain `slug.php` for compatibility; use **`URL`** when creating links. Raw lowercase records are available in `$website_content`.
+
+## Shared service and product page templates
+
+In **Developer view**, open Services or Products and expand **Page template** above the saved entries. Copy the complete PHP example into `service-template.php` or `product-template.php` in your **website root**, beside the StaticPilot folder. Customize that file's HTML once. Five saved services produce five distinct URLs using one service template; newly added items work automatically.
+
+Copy the supplied Apache rules into the website root `.htaccess`, before any existing catch-all rules. Do not put them inside StaticPilot's protected backend `.htaccess`. Apache 2.4, mod_rewrite, and permission to override rewrite rules and Options are required. The rules use relative destinations, so the same setup works at the domain root or in a subdirectory. Existing files and folders take precedence; avoid physical files at your CMS detail URLs.
+
+Pages, services, and products all use flat URLs such as `/{slug}`, with the installation prefix added automatically. Slugs must therefore be unique across all three collections. Use the existing collection loop and each item's `URL` for links. Create `content-router.php` from the supplied code once, plus both template files when using both collections. The router selects the correct template and passes normal pages and unknown URLs to the website's existing `index.php` router.
+
+The template loads `StaticPilot/route.php` **before any output**. It supplies `$Name`, `$Slug`, `$Desc`, `$URL`, `$SEO_Title`, `$SEO_Description`, `$Primary_meta`, `$Facebook_og`, `$Twitter_card`, and `$custom_fields` for the requested record. `$item` retains the raw lowercase fields, and `$type` identifies its collection. Escape plain values with `content_escape()`. The three metadata variables are complete HTML assembled from individually escaped values, so output them directly inside `<head>`:
+
+```php
+<?= $Primary_meta ?>
+<?= $Facebook_og ?>
+<?= $Twitter_card ?>
+```
+
+Do not pass these complete markup variables through `content_escape()`, because that would display the tags as text. Pages and Services have separate Primary metadata, Open Graph / Facebook, and Twitter card field groups. Empty social fields fall back to the primary title, description, canonical URL, `website` Open Graph type, and `summary_large_image` Twitter card. The generated code includes saved custom fields and a collection check so a product cannot render through the service template. Use `content_site_path()` for asset links, for example:
+
+```php
+<link rel="stylesheet" href="<?= content_escape(content_site_path()) ?>assets/style.css">
+```
+
+Keep the detail template separate from listing loops: the listing loops through all records, while the detail template displays the single record selected by its URL. Saving content updates both automatically without generating or editing individual files.

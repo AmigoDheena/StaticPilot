@@ -3,6 +3,69 @@ require_once __DIR__ . '/urls.php';
 function developer_copy_button($id) {
     echo '<button type="button" class="copy-code" data-copy="' . e($id) . '" aria-label="Copy PHP code" title="Copy PHP code"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg></button>';
 }
+function developer_detail_example($section, $names = []) {
+    if (!in_array($section, ['services', 'products'], true)) { throw new InvalidArgumentException('Unknown template collection.'); }
+    $backend = basename(__DIR__);
+    $code = "<?php\nrequire_once __DIR__ . " . var_export('/' . $backend . '/route.php', true) . ";\n";
+    $code .= 'if ($notFound || $type !== ' . var_export($section, true) . ") {\n    http_response_code(404);\n    echo '<h1>Page not found</h1>';\n    exit;\n}\n?>\n";
+    $code .= <<<'PHP'
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <?= $Primary_meta ?>
+  <?= $Facebook_og ?>
+  <?= $Twitter_card ?>
+</head>
+<body>
+<main>
+  <h1><?= content_escape($Name) ?></h1>
+  <p><?= nl2br(content_escape($Desc)) ?></p>
+PHP;
+    foreach (array_unique($names) as $name) {
+        $code .= "\n  <p><?= content_escape(\$custom_fields[" . var_export($name, true) . "] ?? '') ?></p>";
+    }
+    return $code . "\n</main>\n</body>\n</html>";
+}
+function developer_template_rules() {
+    return <<<'APACHE'
+# Add in the WEBSITE ROOT .htaccess, before existing catch-all rules.
+Options -MultiViews
+RewriteEngine On
+# Existing website files and directories keep working.
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+RewriteRule ^[a-z0-9]+(?:-[a-z0-9]+)*/?$ content-router.php [END]
+APACHE;
+}
+function developer_router_example() {
+    $backend = basename(__DIR__);
+    return "<?php\nrequire_once __DIR__ . " . var_export('/' . $backend . '/route.php', true) . ";\n"
+        . "if (!\$notFound && \$type === 'services') { require __DIR__ . '/service-template.php'; exit; }\n"
+        . "if (!\$notFound && \$type === 'products') { require __DIR__ . '/product-template.php'; exit; }\n"
+        . "// Let your existing website router handle normal pages and unknown URLs.\n"
+        . "require __DIR__ . '/index.php';\n";
+}
+function developer_template_panel($section, $rows) {
+    $file = $section === 'services' ? 'service-template.php' : 'product-template.php';
+    $names = [];
+    foreach ($rows as $row) { $names = array_merge($names, array_keys($row['custom_fields'] ?? [])); }
+    echo '<details class="developer-example template-guide"><summary>Page template — one file for all ' . e($section) . '</summary>';
+    echo '<p>Create <code>' . e($file) . '</code> in your website root, beside the <code>' . e(basename(__DIR__)) . '</code> folder. Copy this code and adapt the HTML to your design. Every saved ' . ($section === 'services' ? 'service' : 'product') . ' uses this same file; no per-item files or manual values are needed.</p>';
+    echo '<div class="code-toolbar">'; developer_copy_button('detail-template-code');
+    echo '</div><pre><code id="detail-template-code">' . e(developer_detail_example($section, $names)) . '</code></pre>';
+    echo '<p>Create <code>content-router.php</code> once in the website root. It selects the service or product template from the flat URL and passes normal pages to your existing <code>index.php</code>.</p>';
+    echo '<div class="code-toolbar">'; developer_copy_button('content-router-code');
+    echo '</div><pre><code id="content-router-code">' . e(developer_router_example()) . '</code></pre>';
+    echo '<p>Add these rules to the website root <code>.htaccess</code> (not the backend folder). They require Apache 2.4 with mod_rewrite and AllowOverride enabled. Keep your existing rules and place these before any catch-all rule. Create both template files when using both collections.</p>';
+    echo '<div class="code-toolbar">'; developer_copy_button('template-routing-code');
+    echo '</div><pre><code id="template-routing-code">' . e(developer_template_rules()) . '</code></pre><span class="copy-status" role="status"></span>';
+    echo '<p>Use the Developer integration example below to loop through listing links. Use root-relative asset URLs in the detail template, for example <code>&lt;?= content_escape(content_site_path()) ?&gt;assets/style.css</code>. Saved changes appear automatically; unknown or deleted items return 404.</p>';
+    if ($rows) { echo '<p>Example URL: <a href="' . e(content_url($section, $rows[0]['slug'])) . '" target="_blank" rel="noopener">' . e(content_url($section, $rows[0]['slug'])) . '</a> (available after setup).</p>'; }
+    echo '</details>';
+}
 function developer_field_help($section, $key, $label, $example = null) {
     echo '<details class="code-help"><summary aria-label="PHP example for ' . e($label) . '" aria-controls="help-' . e($key) . '" title="View PHP example"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 6-6 6 6 6m8-12 6 6-6 6M14 3l-4 18"/></svg></summary><div class="code-popover" id="help-' . e($key) . '"><div class="code-toolbar"><strong>PHP example</strong>';
     developer_copy_button('code-' . $key);
@@ -13,6 +76,7 @@ function developer_field_example($section, $key) {
     if ($section === 'custom_sections') { return "<?= content_escape(\$custom_section['" . $key . "'] ?? '') ?>"; }
     if (strpos($section, 'custom:') === 0) { return "<?= content_escape(\$item['" . $key . "'] ?? '') ?>"; }
     if ($section === 'company') {
+        if ($key === 'google_analytics_code') { return '<?= $google_analytics_code ?>'; }
         $variables = ['name'=>'$company_name', 'email'=>'$email', 'address'=>'$address', 'address_short'=>'$address_short', 'whatsapp'=>'$whatsapp_number', 'base_url'=>'BASE_URL'];
         if ($key === 'phone') { return '<?php foreach ($phone as $number): ?> <span><?= content_escape($number) ?></span> <?php endforeach; ?>'; }
         return '<?php echo content_escape(' . $variables[$key] . '); ?>';
@@ -20,6 +84,9 @@ function developer_field_example($section, $key) {
     if ($section === 'social') { return '<?php echo content_escape($' . $key . '); ?>'; }
     if ($section === 'menu') { return '<?php echo content_escape($link[\'' . $key . '\']); ?>'; }
     if ($section === 'testimonials') { return '<?php echo content_escape($testimonial[\'' . $key . '\']); ?>'; }
+    if (in_array($key, ['seo_title','seo_description','seo_keywords','seo_robots','canonical_url'], true)) { return '<?= $Primary_meta ?>'; }
+    if (strpos($key, 'og_') === 0) { return '<?= $Facebook_og ?>'; }
+    if (strpos($key, 'twitter_') === 0) { return '<?= $Twitter_card ?>'; }
     $keys = ['name'=>'Name', 'slug'=>'URL', 'description'=>'Desc', 'seo_title'=>'SEO_Title', 'seo_description'=>'SEO_Description'];
     return '<?php echo content_escape($item[\'' . $keys[$key] . '\']); ?>';
 }
@@ -69,6 +136,9 @@ PHP;
 <?php foreach ($phone as $number): ?>
   <p><?= content_escape($number) ?></p>
 <?php endforeach; ?>
+
+<!-- Put this inside your website template's <head>. -->
+<?= $google_analytics_code ?>
 PHP;
     }
     if ($section === 'social') {

@@ -87,9 +87,9 @@ async function save(section, input) { const r = await request('index.php?section
   assert.equal((await request('storage/content.json')).status,403);
   const vars = JSON.parse(execFileSync('C:/xampp/php/php.exe',['-r','require "template-data.php"; echo json_encode([$company, $phone, $services["smoke-test-service.php"]]);'],{cwd:root,encoding:'utf8'}));
   assert.equal(vars[0],'Test <Company>'); assert.equal(vars[2].Name,'Updated service');
-  assert.equal(vars[2].URL,'/services/smoke-test-service');
+  assert.equal(vars[2].URL,'/smoke-test-service');
   assert.equal(php('require "template-data.php"; echo content_escape($company_name);'),'Test &lt;Company&gt;');
-  for (const [path,name] of [['/smoke-test-page','Test service'],['/services/smoke-test-service','Updated service'],['/products/smoke-test-product','Test service']]) {
+  for (const [path,name] of [['/smoke-test-page','Test service'],['/smoke-test-service','Updated service'],['/smoke-test-product','Test service']]) {
     const result=route(path); assert.equal(result.status,200); assert.equal(result.name,name);
   }
   for (const path of ['/missing','/services/missing','/unknown/nested']) { assert.equal(route(path).status,404); }
@@ -98,7 +98,7 @@ async function save(section, input) { const r = await request('index.php?section
   for (const path of ['setup.php','template-data.php','route.php','content-store.php']) { assert.equal((await request(path)).status,403); }
   await save('company',{action:'save',name:'Test <Company>',base_url:'https://example.com'});
   await save('services',{action:'delete',id:'0'});
-  assert.equal(route('/services/smoke-test-service').status,404);
+  assert.equal(route('/smoke-test-service').status,404);
   // Custom section definitions and nested entries share the protected editor workflow.
   await save('custom_sections',{action:'create',name:'Our purpose',slug:'smoke-purpose',description:'What guides us'});
   await save('custom_sections',{action:'create',name:'Why choose us',slug:'smoke-reasons',description:'Our strengths'});

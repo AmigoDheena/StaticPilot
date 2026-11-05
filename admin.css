@@ -109,8 +109,27 @@ textarea{resize:vertical;min-height:70px}
 .copy-status:empty{display:none}
 .field-note{font-size:11px;color:var(--muted);overflow-wrap:anywhere;margin:6px 0 0}
 .developer-example .code-toolbar{justify-content:flex-end}
+.template-guide{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px;margin:0 0 20px}
 .custom-fields{min-width:0;margin:24px 0 0;padding:0;border:0;border-top:1px solid var(--line)}
 .custom-fields legend{font-size:12px;font-weight:650;padding:0 8px 0 0}
+.editor-content-group{padding:16px 0}
+.editor-content-group h3,.settings-heading h3{font-size:14px;margin:0;color:var(--ink)}
+.editor-settings-group,.custom-fields.custom-settings-group{margin-top:24px;padding:20px;border:1px solid var(--line);border-radius:8px;background:var(--paper);min-width:0}
+.settings-heading{padding-bottom:16px;border-bottom:1px solid var(--line)}
+.settings-heading p{font-size:12px;line-height:1.6;color:var(--muted);margin:8px 0 0}
+.seo-fields{padding:16px 0}
+.seo-fields+.seo-fields{border-top:1px solid var(--line)}
+.seo-fields .seo-group-heading{position:relative;margin:0 0 12px;justify-content:flex-start;gap:8px}
+.seo-group-heading h4{font-size:13px;margin:0;color:var(--ink)}
+.seo-group-heading .code-help{margin-left:0}
+.seo-fields .form-grid{grid-template-columns:minmax(0,1fr);gap:16px}
+.seo-fields .field-heading{margin:0 0 8px;min-height:0}
+.seo-fields .field-heading label{font-size:12px}
+.seo-fields .field-note{line-height:1.6;margin-top:8px}
+.custom-fields.custom-settings-group legend{font-size:14px;padding:0 8px;font-weight:600}
+.custom-name-note{grid-column:1;grid-row:3}
+.custom-value-note{grid-column:2;grid-row:3}
+@media(max-width:640px){.editor-settings-group,.custom-fields.custom-settings-group{padding:16px}.custom-name-note,.custom-value-note{grid-column:auto;grid-row:auto}}
 .custom-field-row{padding-bottom:14px;margin-bottom:12px;border-bottom:1px solid var(--line)}
 .custom-field-row>label{margin-top:8px}
 .custom-field-row textarea{min-height:56px}

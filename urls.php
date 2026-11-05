@@ -12,5 +12,5 @@ function content_site_path() {
 }
 function content_url($collection, $slug) {
     if (!in_array($collection, ['pages', 'services', 'products'], true)) { throw new InvalidArgumentException('Unknown collection.'); }
-    return content_site_path() . ($collection === 'pages' ? '' : $collection . '/') . rawurlencode($slug);
+    return content_site_path() . rawurlencode($slug);
 }
