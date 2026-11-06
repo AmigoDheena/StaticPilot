@@ -63,5 +63,24 @@ foreach (['services','products','pages'] as $collection) {
         ];
     }
 }
+
+// Normal website files can output these variables directly. Match the current
+// PHP filename to a saved page slug; the conventional home page maps
+// index.php to the "home" page. route.php replaces these values when it
+// resolves a clean URL for a page, service, or product.
+$Primary_meta = $Facebook_og = $Twitter_card = '';
+$currentPageScript = basename((string) ($_SERVER['SCRIPT_NAME'] ?? $_SERVER['PHP_SELF'] ?? ''), '.php');
+$currentPageSlug = strtolower($currentPageScript === 'index' ? 'home' : $currentPageScript);
+if ($currentPageSlug !== '') {
+    foreach ($website_content['pages'] as $currentPageRecord) {
+        if (strtolower($currentPageRecord['slug']) === $currentPageSlug
+            || ($currentPageSlug === 'home' && strcasecmp($currentPageRecord['name'], 'home') === 0)) {
+            [$Primary_meta, $Facebook_og, $Twitter_card] = content_meta_markup($currentPageRecord, 'pages');
+            break;
+        }
+    }
+}
+unset($currentPageScript, $currentPageSlug, $currentPageRecord);
+
 $whatsapp = $whatsapp_number === '' ? '' : '<a href="https://wa.me/' . preg_replace('/\D/', '', $whatsapp_number) . '" target="_blank" rel="noopener">WhatsApp</a>';
 $phonenum = !$phone ? '' : '<a href="tel:' . content_escape(preg_replace('/[^+0-9]/', '', $phone[0])) . '">Call us</a>';

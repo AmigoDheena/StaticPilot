@@ -91,6 +91,14 @@ const defs = (fields, existing=false) => Object.assign({definitions_present:'1'}
     const meta=JSON.parse(execFileSync(php,['-r','require "template-data.php"; $item=$services["seo-service.php"]; echo json_encode([$item["Primary_meta"],$item["Facebook_og"],$item["Twitter_card"]]);'],{cwd:app,encoding:'utf8'}));
     assert.match(meta[0],/<title>SEO &lt;Title&gt;<\/title>/);assert.match(meta[0],/name="keywords" content="speed, &lt;fast&gt;"/);assert.match(meta[0],/rel="canonical" href="\/seo-service"/);
     assert.match(meta[1],/property="og:title" content="OG &lt;Title&gt;"/);assert.match(meta[2],/property="twitter:card" content="summary_large_image"/);
+    await save('pages',{...seo,name:'Home',slug:'home',seo_title:'Home metadata'});
+    const homeMeta=JSON.parse(execFileSync(php,['-r','$_SERVER["SCRIPT_NAME"]="/index.php"; require "template-data.php"; echo json_encode([$Primary_meta,$Facebook_og,$Twitter_card]);'],{cwd:app,encoding:'utf8'}));
+    assert.match(homeMeta[0],/<title>Home metadata<\/title>/);assert.match(homeMeta[1],/property="og:title" content="OG &lt;Title&gt;"/);assert.match(homeMeta[2],/property="twitter:title" content="Twitter &lt;Title&gt;"/);
+    await save('pages',{...seo,name:'About',slug:'about',seo_title:'About metadata'});
+    const aboutMeta=execFileSync(php,['-r','$_SERVER["SCRIPT_NAME"]="/about.php"; require "template-data.php"; echo $Primary_meta;'],{cwd:app,encoding:'utf8'});
+    assert.match(aboutMeta,/<title>About metadata<\/title>/);
+    const missingMeta=JSON.parse(execFileSync(php,['-r','$_SERVER["SCRIPT_NAME"]="/missing.php"; require "template-data.php"; echo json_encode([$Primary_meta,$Facebook_og,$Twitter_card]);'],{cwd:app,encoding:'utf8'}));
+    assert.deepEqual(missingMeta,['','','']);
     r=await request('index.php?section=products');assert.match(r.body,/data-url-pattern="\/__SLUG__"/);assert.match(r.body,/id="view-mode-toggle"/);assert.doesNotMatch(r.body,/collection-nav|Custom collections/);
     assert.match(r.body,/Page template — one file for all products/);
     assert.match(r.body,/id="detail-template-code"/);assert.match(r.body,/id="template-routing-code"/);

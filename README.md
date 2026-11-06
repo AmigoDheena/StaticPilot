@@ -73,6 +73,16 @@ Available variables include `$company_name` (also `$company`), `$email`, `$phone
 
 Use the same pattern for `$products` or `$pages`. Each item has `Name`, `Slug`, `Desc`, `URL`, `SEO_Title`, `SEO_Description`, and `SEO` (already escaped HTML tags). Array keys remain `slug.php` for compatibility; use **`URL`** when creating links. Raw lowercase records are available in `$website_content`.
 
+For normal PHP pages, `template-data.php` also selects saved page metadata from the current filename. A saved page with slug `home` supplies metadata to `index.php`; `about.php` uses the saved page with slug `about`, and `contact.php` uses `contact`. Output the generated markup directly inside `<head>`:
+
+```php
+<?= $Primary_meta ?>
+<?= $Facebook_og ?>
+<?= $Twitter_card ?>
+```
+
+If no saved page matches the filename, these variables are empty strings, so the template remains warning-free.
+
 ## Shared service and product page templates
 
 In **Developer view**, open Services or Products and expand **Page template** above the saved entries. Copy the complete PHP example into `service-template.php` or `product-template.php` in your **website root**, beside the StaticPilot folder. Customize that file's HTML once. Five saved services produce five distinct URLs using one service template; newly added items work automatically.

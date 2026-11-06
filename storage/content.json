@@ -8,7 +8,8 @@
         "address": "",
         "address_short": "",
         "base_url": "",
-        "custom_fields": []
+        "custom_fields": [],
+        "google_analytics_code": ""
     },
     "social": {
         "facebook": "",
@@ -24,11 +25,46 @@
             "description": "Website Development Desc",
             "seo_title": "Website Development",
             "seo_description": "Website Development SEO Desc",
-            "custom_fields": []
+            "custom_fields": [],
+            "seo_keywords": "",
+            "seo_robots": "",
+            "canonical_url": "",
+            "og_type": "",
+            "og_url": "",
+            "og_title": "",
+            "og_description": "",
+            "og_image": "",
+            "twitter_card": "",
+            "twitter_url": "",
+            "twitter_title": "",
+            "twitter_description": "",
+            "twitter_image": ""
         }
     ],
     "products": [],
-    "pages": [],
+    "pages": [
+        {
+            "name": "Home",
+            "slug": "home",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc malesuada augue id purus aliquet fermentum. Vivamus at ultricies nisl. Nam at imperdiet libero. Nullam dignissim tempor vehicula. Quisque a purus mi. Curabitur condimentum fringilla rutrum.",
+            "seo_title": "Home",
+            "seo_description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc malesuada augue id purus aliquet fermentum. Vivamus at ultricies nisl. Nam at imperdiet libero. Nullam dignissim tempor vehicula. Quisque a purus mi. Curabitur condimentum fringilla rutrum.",
+            "seo_keywords": "",
+            "seo_robots": "",
+            "canonical_url": "",
+            "og_type": "",
+            "og_url": "",
+            "og_title": "Home",
+            "og_description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc malesuada augue id purus aliquet fermentum. Vivamus at ultricies nisl. Nam at imperdiet libero. Nullam dignissim tempor vehicula. Quisque a purus mi. Curabitur condimentum fringilla rutrum.",
+            "og_image": "",
+            "twitter_card": "",
+            "twitter_url": "",
+            "twitter_title": "Home",
+            "twitter_description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc malesuada augue id purus aliquet fermentum. Vivamus at ultricies nisl. Nam at imperdiet libero. Nullam dignissim tempor vehicula. Quisque a purus mi. Curabitur condimentum fringilla rutrum.",
+            "twitter_image": "",
+            "custom_fields": []
+        }
+    ],
     "menu": [],
     "testimonials": [],
     "custom_sections": [
